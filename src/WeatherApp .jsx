@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const WeatherCard = ({ city, weather, onDelete }) => {
@@ -16,42 +16,31 @@ const WeatherCard = ({ city, weather, onDelete }) => {
           {weather.snow && <p>Snow: {weather.snow['1h']} mm</p>}
         </div>
       )}
-      <button onClick={onDelete}>Delete</button> {/* Botón para eliminar la tarjeta de la ciudad */}
+      <button onClick={onDelete}>Delete</button>
     </div>
   );
 };
 
 const WeatherApp = () => {
-  const [city, setCity] = useState(''); // Estado para almacenar el nombre de la ciudad ingresada por el usuario
-  const [weather, setWeather] = useState(null); // Estado para almacenar los datos meteorológicos de la ciudad
-  const [searchedCities, setSearchedCities] = useState([]); // Estado para almacenar las ciudades buscadas
-  const API_KEY = 'df7876aa005bc1e19dea22e6d777c45a'; // Clave de API para OpenWeatherMap
+  const [city, setCity] = useState(''); 
+  const [weather, setWeather] = useState(null); 
+  const [searchedCities, setSearchedCities] = useState([]); 
+  const API_KEY = 'df7876aa005bc1e19dea22e6d777c45a'; 
 
   useEffect(() => {
     if (city) {
-      // Realizar una solicitud a la API de OpenWeatherMap cuando cambie la ciudad
       axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`)
         .then(response => {
-          // Almacenar los datos meteorológicos de la ciudad y agregar la ciudad a las ciudades buscadas
           setWeather(response.data);
-          addSearchedCity(city);
         })
         .catch(error => {
           console.error('Error fetching weather data:', error);
         });
     }
-  }, [city]); // Ejecutar el efecto cuando cambie la ciudad
+  }, [city]);
 
-  const handleSearch = () => {
-    if (city.trim() !== '') {
-      // No es necesario limpiar el estado del clima aquí
-      // setWeather(null); // Limpiar los datos meteorológicos previos
-    }
-  };
-
-  const addSearchedCity = (city) => {
-    // Agregar la ciudad a las ciudades buscadas
-    setSearchedCities(prevCities => [...prevCities, city]);
+  const handleSearch = (e) => {
+    setCity(e.target.value);
   };
 
   return (
@@ -62,16 +51,14 @@ const WeatherApp = () => {
         type="text"
         placeholder="Enter city name"
         value={city}
-        onChange={(e) => setCity(e.target.value)} // Actualizar el estado de la ciudad al escribir en el input
+        onChange={handleSearch} 
       />
-      <button onClick={handleSearch}>Search</button> {/* Botón para buscar la ciudad */}
       
-      {/* Mostrar la tarjeta de la ciudad buscada si hay datos meteorológicos disponibles */}
       {weather && (
         <WeatherCard 
           city={weather.name} 
           weather={weather} 
-          onDelete={() => setWeather(null)} // Función para eliminar la tarjeta de la ciudad
+          onDelete={() => setWeather(null)} 
         />
       )}
     </div>
